@@ -35,6 +35,7 @@ from tenacity.wait import wait_base
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn, TimeRemainingColumn, TaskID
 from rich.table import Table
+import platform
 
 
 BASE_URL = "https://server.smartlead.ai/api/v1/master-inbox"
@@ -659,8 +660,12 @@ async def writer(
     try:
         if not dry_run and output_path is not None:
             output_path.parent.mkdir(parents=True, exist_ok=True)
-            csv_file = open(output_path, "w", encoding="utf-8", newline="")
-            csv_writer = csv.DictWriter(csv_file, fieldnames=CSV_HEADERS, lineterminator="\n", quoting=csv.QUOTE_ALL)
+            # Use BOM + CRLF on Windows for best Excel compatibility
+            is_windows = platform.system() == "Windows"
+            file_encoding = "utf-8-sig" if is_windows else "utf-8"
+            line_ending = "\r\n" if is_windows else "\n"
+            csv_file = open(output_path, "w", encoding=file_encoding, newline="")
+            csv_writer = csv.DictWriter(csv_file, fieldnames=CSV_HEADERS, lineterminator=line_ending, quoting=csv.QUOTE_ALL)
             csv_writer.writeheader()
 
         while True:
@@ -845,5 +850,6 @@ def main(argv: Optional[List[str]] = None) -> int:
 
 
 if __name__ == "__main__":
+    # For Python 3.8 compatibility, use asyncio.run
     sys.exit(main())
 
