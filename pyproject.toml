@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sl-replies-exporter"
+version = "0.1.0"
+description = "Smartlead Master Inbox Replies to CSV exporter (async, rate limited)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = [
+  "httpx>=0.27",
+  "tenacity>=8.3",
+  "rich>=13.7",
+  "beautifulsoup4>=4.12",
+]
+
+[project.scripts]
+sl-export-smartlead = "export_smartlead_inbox_to_csv:main"
+
+[tool.setuptools]
+py-modules = ["export_smartlead_inbox_to_csv"]
